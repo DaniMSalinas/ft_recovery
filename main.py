@@ -15,19 +15,19 @@ def main():
         return
 
     if unknown:
-        print("Unknown args")
+        re_logger.logger.error("Unknown args")
         return
     if args.minutes:
-        evidences = Recovery(int(args.minutes) * 60)
+        evidences = Recovery(re_logger, args.minutes * 60)
     elif args.hours:
-        evidences = Recovery(args.hours * 3600)
+        evidences = Recovery(re_logger, args.hours * 3600)
     elif args.days:
-        evidences = Recovery(args.days * 86400)
+        evidences = Recovery(re_logger, args.days * 86400)
     elif args.extended:
-        evidences = Recovery(args.extended)
+        evidences = Recovery(re_logger, args.extended)
     else:
-        evidences = Recovery()
-    print(evidences)
+        evidences = Recovery(re_logger)
+    print(evidences.data)
 
 if __name__ == "__main__":
     main()

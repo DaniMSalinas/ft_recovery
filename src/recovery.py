@@ -9,13 +9,14 @@ import pandas
 
 class Recovery():
     """Recovery Class where it's stored all the data"""
-    def __init__(self, logger, time_interval=86400):
+    def __init__(self, logger, time_interval=999999999):
         """Constructor of Recovery Class"""
         timestamp = datetime.now()
         self.time_interval = datetime.timestamp(timestamp) - time_interval
         self.data = {}
         self.windows_mi = wmi.WMI()
         self.logger = logger
+        #datetime.fromtimestamp(datetime.timestamp(datetime.now()))
         self._set_current_version_run()
         self._set_recent_files()
         self._set_installed_program()
@@ -27,13 +28,18 @@ class Recovery():
     def _set_current_version_run(self):
         """Function returns the date of branchs change"""
         self.logger.logger.info("Retrieving current version run evidences")
-        self.data['current_version_run'] = {}
+        self.data['current_version_run'] = []
+        current_version_dict = {}
         key = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE,
                             "Software\\Microsoft\\Windows\\CurrentVersion\\Run")
         reg_win_ts = winreg.QueryInfoKey(key)[2]
         reg_key_ts = self.windows_ticks_to_unix_seconds(reg_win_ts)
+        current_version_dict["date"] = reg_key_ts
+        current_version_dict["values"] = []
+        for value in range(winreg.QueryInfoKey(key)[1]):
+            current_version_dict["values"].append(winreg.EnumValue(key, value)[0])
         if reg_key_ts > self.time_interval:
-            self.data['current_version_run']['date'] = reg_key_ts
+            self.data['current_version_run'].append(current_version_dict)
 
     def _set_recent_files(self):
         """Function returns recent files"""
@@ -53,12 +59,16 @@ class Recovery():
         """Function returns installed software in Windows"""
         self.logger.logger.info("Retrieving installed programs evidences")
         self.data["installed_programs"] = []
-        self.data["installed_programs"].append(Recovery.subkeys_iterator(winreg.HKEY_LOCAL_MACHINE,
+        local_machine_installed_programs = Recovery.subkeys_iterator(winreg.HKEY_LOCAL_MACHINE,
                                     "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
-                                    self.time_interval)[0])
-        self.data["installed_programs"].append(Recovery.subkeys_iterator(winreg.HKEY_CURRENT_USER,
+                                    self.time_interval)[0]
+        for item in local_machine_installed_programs:
+            self.data["installed_programs"].append(item)
+        current_user_installed_programs = Recovery.subkeys_iterator(winreg.HKEY_CURRENT_USER,
                                     "Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall",
-                                    self.time_interval)[0])
+                                    self.time_interval)[0]
+        for item in current_user_installed_programs:
+            self.data["installed_programs"].append(item)
 
     def _set_running_programs(self):
         """Function returns running programs in Windows"""
@@ -110,7 +120,7 @@ class Recovery():
         """Function returns log events"""
         self.logger.logger.info("Retrieving log events evidences")
         self.data["log_events"] = []
-        for log in self.windows_mi.Win32_NTLogEvent(EventType=1):
+        for log in self.windows_mi.Win32_NTLogEvent(EventType=2):
             logs_dict = {}
             logs_dict["name"] = log.SourceName
             logs_dict["type"] = log.Type
@@ -128,7 +138,7 @@ class Recovery():
         try:
             db_query = Recovery.get_query(db_path, db_name, navigator)
         except sqlite3.DatabaseError:
-            self.logger.logger.warning(navigator + "database is locked, unable to read. Skiping")
+            self.logger.logger.warning(navigator + " database is locked, unable to read")
             return
         for element in db_query.values:
             navigator_dict = {}

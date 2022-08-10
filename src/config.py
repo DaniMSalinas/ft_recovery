@@ -13,11 +13,11 @@ class ConfigLibrary:
 
     def set_arguments(self):
         """This function sets the args of the program"""
-        self.parser.add_argument('-m', '--minutes', metavar='<hours>', type=str,
+        self.parser.add_argument('-m', '--minutes', metavar='<hours>', type=int,
         help="set the time interval to see the evidences.\nFormat MUST be in number of hours")
-        self.parser.add_argument('-ho', '--hours', metavar='<hours>', type=str,
+        self.parser.add_argument('-ho', '--hours', metavar='<hours>', type=int,
         help="set the time interval to see the evidences.\nFormat MUST be in number of hours")
-        self.parser.add_argument('-d', '--days', metavar='<days>', type=str,
+        self.parser.add_argument('-d', '--days', metavar='<days>', type=int,
         help="set the time interval to see the evidences.\nFormat MUST be in number of days")
         self.parser.add_argument('-e', '--extended', metavar='<date>', type=str,
         help="set the time interval to see the evidences.\nFormat MUST be yyyy-MM-dd HH:mm:ss.SSS")
