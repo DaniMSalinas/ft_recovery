@@ -207,21 +207,21 @@ class Recovery():
         """ This function saves evidences dictionay into files"""
         for key in evidences.data.items():
             if key[0] == 'current_version_run' and len(key[1]) != 0:
-                logger.info("Saving %s evidences", key[0])
+                logger.logger.info("Saving %s evidences", key[0])
                 evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
                 evidence_file.write(key[0].upper() + '\n\n')
                 for value in key[1][0]['values']:
                     evidence_file.write(str(key[1][0]['date']) + ': ' + str(value) + '\n')
                 evidence_file.close()
             elif (key[0] == 'recent_files' or key[0] == 'installed_programs') and len(key[1]) != 0:
-                logger.info("Saving %s evidences", key[0])
+                logger.logger.info("Saving %s evidences", key[0])
                 evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
                 evidence_file.write(key[0].upper() + '\n\n')
                 for item in key[1]:
                     evidence_file.write(str(item['date']) + ': ' + str(item['name']) + '\n')
                 evidence_file.close()
             elif key[0] == 'running_programs' and len(key[1]) != 0:
-                logger.info("Saving %s evidences", key[0])
+                logger.logger.info("Saving %s evidences", key[0])
                 evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
                 evidence_file.write(key[0].upper() + '\n\n')
                 for item in key[1]:
@@ -229,7 +229,7 @@ class Recovery():
                     + str(item['pid']) + '\n')
                 evidence_file.close()
             elif key[0] == 'navigator_historical' and len(key[1]) != 0:
-                logger.info("Saving %s evidences", key[0])
+                logger.logger.info("Saving %s evidences", key[0])
                 evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
                 evidence_file.write(key[0].upper() + '\n\n')
                 for item in key[1]:
@@ -237,7 +237,7 @@ class Recovery():
                     + str(item['url']) + '\n')
                 evidence_file.close()
             elif key[0] == 'connected_devices' and len(key[1]) != 0:
-                logger.info("Saving %s evidences", key[0])
+                logger.logger.info("Saving %s evidences", key[0])
                 evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
                 evidence_file.write(key[0].upper() + '\n\n')
                 for item in key[1]:
@@ -245,10 +245,10 @@ class Recovery():
                     + str(item['type']) + '\n')
                 evidence_file.close()
             elif key[0] == 'log_events' and len(key[1]) != 0:
-                logger.info("Saving %s evidences", key[0])
+                logger.logger.info("Saving %s evidences", key[0])
                 evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
                 evidence_file.write(key[0].upper() + '\n\n')
                 for item in key[1]:
-                    evidence_file.write(str(item['date']) + ': ' + ' [' + str(item['type'])
-                    + '] ' + str(item['name']) +  ' ' + str(item['message']) + '\n')
+                    evidence_file.write(str(item['date']) + ' [' + str(item['type'])
+                    + ']: ' + str(item['name']) +  ' ' + str(item['message']) + '\n')
                 evidence_file.close()
