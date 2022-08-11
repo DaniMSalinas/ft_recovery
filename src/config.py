@@ -20,7 +20,7 @@ class ConfigLibrary:
         self.parser.add_argument('-d', '--days', metavar='<days>', type=int,
         help="set the time interval to see the evidences.\nFormat MUST be in number of days")
         self.parser.add_argument('-e', '--extended', metavar='<date>', type=str,
-        help="set the time interval to see the evidences.\nFormat MUST be yyyy-MM-dd HH:mm:ss.SSS")
+        help="set the time interval to see the evidences.\nFormat MUST be yyyy-MM-dd HH:mm:ss. IE: 29-Apr-2013-15:59:02")
 
     def get_program_version(self):
         """function returns the current program version"""

@@ -1,4 +1,6 @@
 """Main program for cyber forensic"""
+from datetime import datetime
+import time
 from src.config import ConfigLibrary
 from src.recovery import Recovery
 from src.logger import RecoveryLogger
@@ -24,10 +26,12 @@ def main():
     elif args.days:
         evidences = Recovery(re_logger, args.days * 86400)
     elif args.extended:
-        evidences = Recovery(re_logger, args.extended)
+        date = time.mktime(datetime.strptime(args.extended, "%d/%m/%y %H:%M:%S").timetuple())
+        evidences = Recovery(re_logger, date)
     else:
         evidences = Recovery(re_logger)
-    print(evidences.data)
+
+    Recovery.save_evidences(re_logger, evidences)
 
 if __name__ == "__main__":
     main()

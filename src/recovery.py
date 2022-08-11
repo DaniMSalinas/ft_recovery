@@ -16,7 +16,7 @@ class Recovery():
         self.data = {}
         self.windows_mi = wmi.WMI()
         self.logger = logger
-        #datetime.fromtimestamp(datetime.timestamp(datetime.now()))
+        Recovery.remove_files("data")
         self._set_current_version_run()
         self._set_recent_files()
         self._set_installed_program()
@@ -73,7 +73,7 @@ class Recovery():
     def _set_running_programs(self):
         """Function returns running programs in Windows"""
         self.logger.logger.info("Retrieving running programs evidences")
-        self.data["running_processes"] = []
+        self.data["running_programs"] = []
         for process in self.windows_mi.Win32_Process():
             process_dict = {}
             if process.HandleCount > 0:
@@ -83,7 +83,7 @@ class Recovery():
                 process_dict["date"] = time.mktime(datetime.strptime(
                                         date.split('.')[0],'%Y%m%d%H%M%S').timetuple())
                 if process_dict["date"] > self.time_interval:
-                    self.data["running_processes"].append(process_dict)
+                    self.data["running_programs"].append(process_dict)
 
     def _set_navigation_historial(self):
         """Function returns the navigation historial on Windows"""
@@ -194,3 +194,61 @@ class Recovery():
             except Exception as exc:
                 raise sqlite3.DatabaseError from exc
         return db_query
+
+    @staticmethod
+    def remove_files(path):
+        """Function remove all files of a given path"""
+        path_directory = os.listdir(path)
+        for file in path_directory:
+            os.remove(path + '\\' + file)
+
+    @staticmethod
+    def save_evidences(logger, evidences):
+        """ This function saves evidences dictionay into files"""
+        for key in evidences.data.items():
+            if key[0] == 'current_version_run' and len(key[1]) != 0:
+                logger.info("Saving %s evidences", key[0])
+                evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
+                evidence_file.write(key[0].upper() + '\n\n')
+                for value in key[1][0]['values']:
+                    evidence_file.write(str(key[1][0]['date']) + ': ' + str(value) + '\n')
+                evidence_file.close()
+            elif (key[0] == 'recent_files' or key[0] == 'installed_programs') and len(key[1]) != 0:
+                logger.info("Saving %s evidences", key[0])
+                evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
+                evidence_file.write(key[0].upper() + '\n\n')
+                for item in key[1]:
+                    evidence_file.write(str(item['date']) + ': ' + str(item['name']) + '\n')
+                evidence_file.close()
+            elif key[0] == 'running_programs' and len(key[1]) != 0:
+                logger.info("Saving %s evidences", key[0])
+                evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
+                evidence_file.write(key[0].upper() + '\n\n')
+                for item in key[1]:
+                    evidence_file.write(str(item['date']) + ': ' + str(item['name'])
+                    + str(item['pid']) + '\n')
+                evidence_file.close()
+            elif key[0] == 'navigator_historical' and len(key[1]) != 0:
+                logger.info("Saving %s evidences", key[0])
+                evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
+                evidence_file.write(key[0].upper() + '\n\n')
+                for item in key[1]:
+                    evidence_file.write(str(item['date']) + ': ' + str(item['navigator'])
+                    + str(item['url']) + '\n')
+                evidence_file.close()
+            elif key[0] == 'connected_devices' and len(key[1]) != 0:
+                logger.info("Saving %s evidences", key[0])
+                evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
+                evidence_file.write(key[0].upper() + '\n\n')
+                for item in key[1]:
+                    evidence_file.write(str(item['id']) + ': ' + str(item['name'])
+                    + str(item['type']) + '\n')
+                evidence_file.close()
+            elif key[0] == 'log_events' and len(key[1]) != 0:
+                logger.info("Saving %s evidences", key[0])
+                evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
+                evidence_file.write(key[0].upper() + '\n\n')
+                for item in key[1]:
+                    evidence_file.write(str(item['date']) + ': ' + ' [' + str(item['type'])
+                    + '] ' + str(item['name']) +  ' ' + str(item['message']) + '\n')
+                evidence_file.close()
