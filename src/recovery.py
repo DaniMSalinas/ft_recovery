@@ -149,7 +149,7 @@ class Recovery():
             else:
                 navigator_dict["date"] = (element[1] /1000000) - 11644473600
             if navigator_dict["date"] > self.time_interval:
-                self.data["navigation_historical"] = [].append(navigator_dict)
+                self.data["navigation_historical"].append(navigator_dict)
 
     @staticmethod
     def windows_ticks_to_unix_seconds(windows_ticks):
@@ -198,6 +198,8 @@ class Recovery():
     @staticmethod
     def remove_files(path):
         """Function remove all files of a given path"""
+        if not os.path.isdir(path):
+            os.mkdir(path)
         path_directory = os.listdir(path)
         for file in path_directory:
             os.remove(path + '\\' + file)
@@ -226,15 +228,15 @@ class Recovery():
                 evidence_file.write(key[0].upper() + '\n\n')
                 for item in key[1]:
                     evidence_file.write(str(item['date']) + ': ' + str(item['name'])
-                    + str(item['pid']) + '\n')
+                    + ' ' + str(item['pid']) + '\n')
                 evidence_file.close()
-            elif key[0] == 'navigator_historical' and len(key[1]) != 0:
+            elif key[0] == 'navigation_historical' and len(key[1]) != 0:
                 logger.logger.info("Saving %s evidences", key[0])
                 evidence_file = open('data\\' + key[0], 'w', encoding="utf-8")
                 evidence_file.write(key[0].upper() + '\n\n')
                 for item in key[1]:
                     evidence_file.write(str(item['date']) + ': ' + str(item['navigator'])
-                    + str(item['url']) + '\n')
+                    + ' ' + str(item['url']) + '\n')
                 evidence_file.close()
             elif key[0] == 'connected_devices' and len(key[1]) != 0:
                 logger.logger.info("Saving %s evidences", key[0])
@@ -242,7 +244,7 @@ class Recovery():
                 evidence_file.write(key[0].upper() + '\n\n')
                 for item in key[1]:
                     evidence_file.write(str(item['id']) + ': ' + str(item['name'])
-                    + str(item['type']) + '\n')
+                    + ' ' + str(item['type']) + '\n')
                 evidence_file.close()
             elif key[0] == 'log_events' and len(key[1]) != 0:
                 logger.logger.info("Saving %s evidences", key[0])
